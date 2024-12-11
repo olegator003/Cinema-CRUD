@@ -54,33 +54,48 @@ public class Main {
     // Обработчик меню для работы с местами
     private static void handleSeatMenu(DatabaseManager dbManager, Scanner scanner) throws SQLException {
         while (true) {
-            System.out.println("\n=== Seat Menu ===");
+            System.out.println("\n=== Меню мест ===");
             System.out.println("1. Добавить место");
             System.out.println("2. Показать все места");
             System.out.println("3. Назад");
             System.out.print("Ваш выбор: ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Считываем остаток строки после числового ввода
+            String input = scanner.nextLine();
+            if (!input.matches("\\d+")) {  // Проверяем, что ввод только цифра
+                System.out.println("Неверный ввод. Пожалуйста, введите число.");
+                continue;
+            }
 
+            int choice = Integer.parseInt(input);
             switch (choice) {
                 case 1 -> {
-                    System.out.print("Введите номер места: ");
-                    int seatNumber = scanner.nextInt();
-                    scanner.nextLine(); // Считываем остаток строки после ввода числа
-                    System.out.print("Введите название кинотеатра: ");
-                    String cinemaName = scanner.nextLine(); // Считываем строку для имени кинотеатра
-                    System.out.print("Введите адрес кинотеатра: ");
-                    String address = scanner.nextLine(); // Считываем строку для адреса
-                    System.out.print("Введите номер зала: ");
-                    int hallNumber = scanner.nextInt();
-                    dbManager.insertSeat(seatNumber, cinemaName, address, hallNumber);
-                    System.out.println("Место добавлено.");
+                    try {
+                        System.out.print("Введите номер места: ");
+                        int seatNumber = getValidInteger(scanner);
+
+                        System.out.print("Введите название кинотеатра: ");
+                        String cinemaName = getNonEmptyString(scanner, "Название кинотеатра не может быть пустым.");
+
+                        System.out.print("Введите адрес кинотеатра: ");
+                        String address = getNonEmptyString(scanner, "Адрес кинотеатра не может быть пустым.");
+
+                        System.out.print("Введите номер зала: ");
+                        int hallNumber = getValidInteger(scanner);
+
+                        dbManager.insertSeat(seatNumber, cinemaName, address, hallNumber);
+                        System.out.println("Место добавлено.");
+                    } catch (SQLException e) {
+                        System.err.println("Ошибка при добавлении места: " + e.getMessage());
+                    }
                 }
                 case 2 -> {
-                    List<String> seats = dbManager.getAllSeats();
-                    System.out.println("Список мест:");
-                    seats.forEach(System.out::println);
+                    try {
+                        List<String> seats = dbManager.getAllSeats();
+                        System.out.println("Список мест:");
+                        seats.forEach(System.out::println);
+                    } catch (SQLException e) {
+                        System.err.println("Ошибка при получении списка мест: " + e.getMessage());
+                    }
                 }
                 case 3 -> {
                     System.out.println("Возврат в главное меню...");
@@ -94,7 +109,7 @@ public class Main {
     // Обработчик меню для работы с билетами
     private static void handleTicketMenu(DatabaseManager dbManager, Scanner scanner) throws SQLException {
         while (true) {
-            System.out.println("\n=== Ticket Menu ===");
+            System.out.println("\n=== Меню билетов ===");
             System.out.println("1. Добавить билет");
             System.out.println("2. Показать все билеты");
             System.out.println("3. Назад");
@@ -149,10 +164,10 @@ public class Main {
         }
     }
 
-
+    // Обработчик меню для работы с кинотеатрами
     private static void handleCinemaMenu(DatabaseManager dbManager, Scanner scanner) throws SQLException {
         while (true) {
-            System.out.println("\n=== Cinema Menu ===");
+            System.out.println("\n=== Меню кинотеатров ===");
             System.out.println("1. Добавить кинотеатр");
             System.out.println("2. Показать все кинотеатры");
             System.out.println("3. Обновить кинотеатр");
@@ -206,9 +221,10 @@ public class Main {
         }
     }
 
+    // Обработчик меню для работы с залами
     private static void handleHallMenu(DatabaseManager dbManager, Scanner scanner) throws SQLException {
         while (true) {
-            System.out.println("\n=== Hall Menu ===");
+            System.out.println("\n=== Меню залов ===");
             System.out.println("1. Добавить зал");
             System.out.println("2. Показать все залы");
             System.out.println("3. Обновить зал");
@@ -271,9 +287,10 @@ public class Main {
         }
     }
 
+    // Обработчик меню для работы с фильмами
     private static void handleMovieMenu(DatabaseManager dbManager, Scanner scanner) throws SQLException {
         while (true) {
-            System.out.println("\n=== Movie Menu ===");
+            System.out.println("\n=== Меню фильмов ===");
             System.out.println("1. Добавить фильм");
             System.out.println("2. Показать все фильмы");
             System.out.println("3. Обновить фильм");
@@ -322,6 +339,7 @@ public class Main {
             }
         }
     }
+
 
     private static void handleSessionMenu(DatabaseManager dbManager, Scanner scanner) throws SQLException {
         while (true) {
@@ -398,5 +416,24 @@ public class Main {
             }
         }
     }
+    private static int getValidInteger(Scanner scanner) {
+        while (true) {
+            String input = scanner.nextLine();
+            try {
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.print("Неверный ввод. Пожалуйста, введите целое число: ");
+            }
+        }
+    }
 
+    private static String getNonEmptyString(Scanner scanner, String errorMessage) {
+        while (true) {
+            String input = scanner.nextLine().trim();
+            if (!input.isEmpty()) {
+                return input;
+            }
+            System.out.print(errorMessage + " Повторите ввод: ");
+        }
+    }
 }
