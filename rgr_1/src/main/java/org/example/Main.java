@@ -29,6 +29,11 @@ public class Main {
                 System.out.println("7. Exit");
                 System.out.print("Выберите таблицу для работы: ");
 
+                while (!scanner.hasNextInt()) {
+                    System.out.println("Ошибка! Пожалуйста, введите число.");
+                    scanner.next();
+                }
+
                 int tableChoice = scanner.nextInt();
                 scanner.nextLine(); // Считываем остаток строки
 
